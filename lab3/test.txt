@@ -1,0 +1,10 @@
+(T && R)
+
+AA(T && R)
+
+AA(AA(T && R))
+
+AA(AA(T && R), AA(T && R))
+
+AA = (AA(T && R), AA(T && R, T || && R))
+
