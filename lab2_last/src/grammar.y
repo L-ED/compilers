@@ -31,7 +31,7 @@ int yyparse();
 %%
 /*Grammar*/
 program: 
-   | program operator
+   | program operator {printf("Program call\n");}
    ;
 
 operator:
@@ -42,29 +42,45 @@ operator:
         }
     | IDENTIFIER ASSIGN operator EOL {
         yylineno+=1;
-        // printf("found assign\n");
+        printf("found assign\n");
         }
-    | IDENTIFIER LPARENT ops RPARENT {
-        // printf("func call\n");
-        }
-    | IDENTIFIER LPARENT ops COMMA ops RPARENT {
-        // printf("func call\n");
-        }
+
+    // | IDENTIFIER LPARENT opslist RPARENT {
+    //     printf("func call\n");
+    //     }
+
+
+    // | IDENTIFIER LPARENT ops RPARENT {
+    //     // printf("func call\n");
+    //     }
+    // | IDENTIFIER LPARENT ops COMMA ops RPARENT {
+    //     // printf("func call\n");
+    //     }
     | error EOL// {yyerror;}
     ;
 
+// opslist: ops
+//     | ops COMMA opslist {
+//         printf("arglist\n");
+//     }
+
+
 ops: term
     | ops LXOR term {
-        // printf("found op\n");
+        printf("found op\n");
         }
     | ops LOR term {
-        // printf("found op\n");
+        printf("found op\n");
         }
     | ops LNOT term {
-        // printf("found op\n");
+        printf("found op\n");
         }
     | ops LAND term {
-        // printf("found op\n");
+        printf("found op\n");
+        }
+
+    | IDENTIFIER LPARENT opslist RPARENT {
+        printf("func call\n");
         }
     // | ops COMMA ops {
     //     // printf("args\n");
@@ -77,15 +93,20 @@ ops: term
     //     }
     ;
 
+opslist: ops
+    | ops COMMA opslist {
+        printf("arglist\n");
+    }
+
 term:
     IDENTIFIER {
-        // printf("found id\n");
+        printf("found id\n");
         }
     | TRUE {
-        // printf("found T\n");
+        printf("found T\n");
         }
     | FALSE {
-        // printf("found F\n");
+        printf("found F\n");
         }
     |
     // | LPARENT ops RPARENT {printf("found parentheses\n");}

@@ -1,7 +1,7 @@
 #ifndef ASTTREE_H
 #define ASTTREE_H
 
-#include <algorithm> //std::next
+// #include <algorithm> //std::next
 #include <sstream> //std::stringstream
 #include <memory>
 #include <list>
@@ -44,8 +44,10 @@ namespace AstTree {
 // };
 
 enum NodeType{
-    Prog, Assign, FuncCall, BOP, Elem
+    Prog, Assign, FuncCall, BOP, UOP, Elem, Root, ID, True, False
 };
+
+
 
 class AstNode: public std::enable_shared_from_this<AstNode>{
     public:
@@ -57,11 +59,16 @@ class AstNode: public std::enable_shared_from_this<AstNode>{
             name_(std::move(name))
         {}
 
+        AstNode()
+            :type_(std::move(Root)),
+            name_(std::move(""))
+        {}
+
         ~AstNode()
         {}
 
 
-        void create_child(Sharedptr child){
+        void create_child(const Sharedptr child){
             auto self = this->shared_from_this();
             child->setParent(self);
             childnodes_.emplace_back(std::move(child));
@@ -76,10 +83,34 @@ class AstNode: public std::enable_shared_from_this<AstNode>{
             if(child2){
                 inst->create_child(child2);
             }
+
+            return inst;
         }
 
-        void setParent(const Weakptr &parent){
+
+        static Sharedptr CreateInstance(NodeType type, std::string name, const Sharedptr &child1){
+            return CreateInstance(type, name, child1, Sharedptr());
+        }
+
+
+        static Sharedptr CreateInstance(NodeType type, std::string name){
+            return CreateInstance(type, name, Sharedptr(), Sharedptr());
+        }
+        
+        static Sharedptr CreateInstance(NodeType type, const Sharedptr &child1){
+            return CreateInstance(type, "", child1, Sharedptr());
+        }
+
+
+        static Sharedptr CreateInstance(NodeType type){
+            return CreateInstance(type, "", Sharedptr(), Sharedptr());
+        }
+
+
+        void setParent(const Sharedptr &parent){
+            auto self = this->shared_from_this();
             parent_ = parent;
+            parent->create_child(self);
         }
 
         NodeType getType(){
@@ -97,7 +128,7 @@ class AstNode: public std::enable_shared_from_this<AstNode>{
     private:
         NodeType type_;
         std::list<Sharedptr> childnodes_;
-        Weakptr parent_;
+        Sharedptr parent_;
         std::string name_;
 
 }; 

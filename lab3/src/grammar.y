@@ -1,7 +1,20 @@
+%defines
+%define api.token.constructor
+%define api.value.type variant
+%define parse.assert
+// %define api.header.include {"grammar.h"}
+
+
 %{
+
 #include <stdio.h>
-#include "grammar.h"
+#include "ast_tree.hpp"
+
+// #include "grammar.h"
 #include "lexer.h"
+#include "grammar.h"
+
+
 extern int yylineno;
 void yyerror(const char *msg)
 {  fprintf(stderr,"%d: %s\n",yylineno, msg);
@@ -11,10 +24,14 @@ int yyparse();
 
 %}
 
+%require "3.2"
+%language "c++"
+
 %precedence TOK_UMIN
 %define parse.error verbose
 
 %token LAND LOR LNOT LXOR
+// %token <std::string> IDENTIFIER
 %token IDENTIFIER
 %token TRUE FALSE
 %token RPARENT LPARENT 
@@ -26,12 +43,14 @@ int yyparse();
 %left LAND
 %left LNOT
 
+// %nterm <AstTree::AstNode> operator term ops opslist
+
 // %start program
 
 %%
 /*Grammar*/
 program: 
-   | program operator
+   | program operator {printf("Program call\n");}
    ;
 
 operator:
@@ -42,57 +61,54 @@ operator:
         }
     | IDENTIFIER ASSIGN operator EOL {
         yylineno+=1;
-        // printf("found assign\n");
+        printf("found assign\n");
         }
-    | IDENTIFIER LPARENT ops RPARENT {
-        // printf("func call\n");
-        }
-    | IDENTIFIER LPARENT ops COMMA ops RPARENT {
-        // printf("func call\n");
-        }
+
     | error EOL// {yyerror;}
     ;
 
+
 ops: term
     | ops LXOR term {
-        // printf("found op\n");
+        printf("found op\n");
         }
     | ops LOR term {
-        // printf("found op\n");
+        printf("found op\n");
         }
     | ops LNOT term {
-        // printf("found op\n");
+        printf("found op\n");
         }
     | ops LAND term {
-        // printf("found op\n");
+        printf("found op\n");
         }
-    // | ops COMMA ops {
-    //     // printf("args\n");
-    //     }
-    // | LPARENT ops RPARENT {
-        // printf("found parentheses\n");
-        // }
-    // | IDENTIFIER LPARENT ops RPARENT {
-    //     // printf("func call\n");
-    //     }
+
+    | IDENTIFIER LPARENT opslist RPARENT {
+        printf("func call\n");
+        }
     ;
+
+opslist: ops
+    | ops COMMA opslist {
+        printf("arglist\n");
+    }
 
 term:
     IDENTIFIER {
-        // printf("found id\n");
+        // $$ = AstTree::AstNode.CreateInstance(AstTree::ID, S1);
+        printf("found id\n");
         }
     | TRUE {
-        // printf("found T\n");
+        // $$ = AstTree::AstNode.CreateInstance(AstTree::True);
+        printf("found T\n");
         }
     | FALSE {
-        // printf("found F\n");
+        // $$ = AstTree::AstNode.CreateInstance(AstTree::False);
+        printf("found F\n");
         }
     |
-    // | LPARENT ops RPARENT {printf("found parentheses\n");}
-    // | IDENTIFIER LPARENT ops RPARENT {printf("func call\n");}
-    // | IDENTIFIER ASSIGN ops {printf("found assign\n");}
-    // | ops COMMA ops {printf("args\n");}
+
     ;
+    
 %%
 
 // void yyerror(const char *msg)
@@ -102,6 +118,9 @@ term:
 
 int main( int argc, char **argv )
 {
+
+    AstTree::AstNode tree();
+
     ++argv, --argc; /* skip over program name */
     if ( argc > 0 )
         yyin = fopen( argv[0], "r" );
@@ -109,8 +128,11 @@ int main( int argc, char **argv )
     else
         yyin = stdin;
     // yylex();
+    // yy::parser parse;
+    // parse();
     yyparse();
-    
+    printf("Parsed");
+
     if (argc > 0)
         fclose(yyin);
 
