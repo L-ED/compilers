@@ -31,69 +31,64 @@ int yyparse();
 %%
 /*Grammar*/
 program: 
-   | program operator EOL{printf("Program call\n");}
+    | program operator EOL{
+    }
    ;
 
 operator: ops
-    | IDENTIFIER ASSIGN ops{
-        // yylineno+=1;
-        printf("found assign\n");
+    | var ASSIGN ops {
+        // printf("found assign\n");
         }
-    | error
     ;
 
-ops: term
-    | ops LXOR term {
-        printf("found op\n");
-        }
-    | ops LOR term {
-        printf("found op\n");
-        }
-    | ops LNOT term {
-        printf("found op\n");
-        }
-    | ops LAND term {
-        printf("found op\n");
+
+ops: uop
+    | ops LXOR uop {
+        // printf("found op\n");
         }
 
-    | IDENTIFIER LPARENT opslist RPARENT {
-        printf("func call\n");
+    | ops LOR uop {
+        // printf("found op\n");
         }
-    
-    
-    // | ops COMMA ops {
-    //     // printf("args\n");
-    //     }
-    // | LPARENT ops RPARENT {
-        // printf("found parentheses\n");
-        // }
-    // | IDENTIFIER LPARENT ops RPARENT {
-    //     // printf("func call\n");
-    //     }
+
+    | ops LAND uop {
+        // printf("found op\n");
+        }
     ;
 
-opslist: ops
-    | ops COMMA opslist {
-        printf("arglist\n");
+opslist: ops 
+    | opslist COMMA ops {
+        // printf("arglist %s and op %s\n", $1.node.name, $3.node.name);
     }
     |
+    ;
 
-term:
-    IDENTIFIER {
-        printf("found id\n");
+uop: term
+    | LNOT term {
+        // printf("found uop\n");
         }
-    | TRUE {
-        printf("found T\n");
+    ;
+
+term: var
+    | state
+    | var LPARENT opslist RPARENT {
+        // printf("func call {%s} \n", yylval.str);
+        }
+    ;
+
+var:
+    IDENTIFIER {
+        // printf("found id {%s}\n", yylval.str);
+    }
+    ;
+
+state:
+    TRUE {
+        // printf("found True");
         }
     | FALSE {
-        printf("found F\n");
+        // printf("found False");
         }
-    
-    // | LPARENT ops RPARENT {printf("found parentheses\n");}
-    // | IDENTIFIER LPARENT ops RPARENT {printf("func call\n");}
-    // | IDENTIFIER ASSIGN ops {printf("found assign\n");}
-    // | ops COMMA ops {printf("args\n");}
-    ;
 %%
 
 // void yyerror(const char *msg)

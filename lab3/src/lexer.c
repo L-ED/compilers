@@ -854,7 +854,7 @@ YY_RULE_SETUP
 {
     // printf("sending ID %s\n", yytext);
     yylval.str = strdup(yytext);
-    printf("sending ID %s\n", yylval.str);
+    // printf("sending ID %s\n", yylval.str);
     // Token tok = IDENTIFIER;
     // tok.name = strdup(yytext);
     // return tok;
