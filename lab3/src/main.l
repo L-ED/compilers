@@ -1,3 +1,4 @@
+
 /*
 Калькулятор вычисляет логические выражения. Символьными литералами в
 данном случае являются символы T (класс токена TRUE) и F (класс токена FALSE).
@@ -21,18 +22,40 @@
 */
 
 %option noyywrap
-%option c++
 /* interactive bison
 */
 %{
 /* funcs and headers */
 // #include "lexer.h"
+
+// extern char* yylval;
+// #define YYSTYPE char*
+
+struct Node{
+    // type op;
+    char* name;
+    struct Node* args;
+};
+
+union data{
+    char* str;
+    struct Node node;
+};
+
+#define YYSTYPE union data
+
+
+
 #include "grammar.h"
 
 void lex_error(const char *msg, const char *args)
 {  
     fprintf(stderr,"%d: %s %s\n",yylineno, msg, args);
 }
+
+// #define YYSTYPE char*
+// extern char* yylval;
+
 
 %}
 /* definitions and templates */
@@ -73,8 +96,12 @@ ID [a-zA-Z_][a-zA-Z0-9_]*
     return FALSE;}
 [ \t] {;}
 {ID} {
-    // printf("sending ID\n");
+    // printf("sending ID %s\n", yytext);
+    yylval.str = strdup(yytext);
+    printf("sending ID %s\n", yylval.str);
+
     return IDENTIFIER;}
+
 [\n] {return EOL;} 
 . {
     // printf("ERROR\n");
