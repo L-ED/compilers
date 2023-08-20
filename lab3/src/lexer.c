@@ -454,30 +454,9 @@ int yy_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "./src/main.l"
-/*
-Калькулятор вычисляет логические выражения. Символьными литералами в
-данном случае являются символы T (класс токена TRUE) и F (класс токена FALSE).
-Возможные действия над аргументами: конъюнкция && (класс токена LAND), дизъ-
-юнкция || (класс токена LOR), строгая дизъюнкция ^ (класс токена LXOR), отри-
-цание ! (класс токена LNOT).
-
-• Идентификатор: название функций и переменных, состоящее из малень-
-ких и заглавных букв латинского алфавита, цифр и подчёркиваний. Иденти-
-фикатор не может начинаться с цифры. Класс токена идентификатора на-
-зывается IDENTIFIER.
-• Скобки: (, ). Классы токенов скобок называются LPARENT и RPARENT соответственно.
-• Запятая: ,. Класс токена запятой называется COMMA. 
-Запятая используется для разделения аргументов при вызове функции.
-• Присваивание: =. Класс токена присваивания называется ASSIGN. 
-Присваивание служит чтобы задать переменной какое-либо значение.
-• Ошибка: Класс токена ошибки называется ERROR. 
-Лексема, содержащая ошибку появляется если входные символы не явлюятся 
-символами рассматриваемого языка.
-
-*/
 /* interactive bison
 */
-#line 28 "./src/main.l"
+#line 6 "./src/main.l"
 /* funcs and headers */
 // #include "lexer.h"
 
@@ -497,7 +476,13 @@ union data{
 
 #define YYSTYPE union data
 
+struct Token{
+    int token;
+    char* name;
+};
 
+typedef struct Token Token;
+// #define YYTOKENTYPE Token
 
 #include "grammar.h"
 
@@ -510,9 +495,9 @@ void lex_error(const char *msg, const char *args)
 // extern char* yylval;
 
 
-#line 514 "./src/lexer.c"
+#line 499 "./src/lexer.c"
 /* definitions and templates */
-#line 516 "./src/lexer.c"
+#line 501 "./src/lexer.c"
 
 #define INITIAL 0
 
@@ -729,9 +714,9 @@ YY_DECL
 		}
 
 	{
-#line 66 "./src/main.l"
+#line 50 "./src/main.l"
 
-#line 735 "./src/lexer.c"
+#line 720 "./src/lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -790,108 +775,111 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 67 "./src/main.l"
+#line 51 "./src/main.l"
 {
     // printf("sending (\n");
     return LPARENT;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 70 "./src/main.l"
+#line 54 "./src/main.l"
 {
     // printf("sending )\n");
     return RPARENT;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 73 "./src/main.l"
+#line 57 "./src/main.l"
 {
     // printf("sending ,\n");
     return COMMA;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 76 "./src/main.l"
+#line 60 "./src/main.l"
 {
     // printf("sending =\n");
     return ASSIGN;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 79 "./src/main.l"
+#line 63 "./src/main.l"
 {
     // printf("sending '&&'\n");
     return LAND;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 82 "./src/main.l"
+#line 66 "./src/main.l"
 {
     // printf("sending '||'\n");
     return LOR;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 85 "./src/main.l"
+#line 69 "./src/main.l"
 {
     // printf("sending '!'\n");
     return LNOT;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 88 "./src/main.l"
+#line 72 "./src/main.l"
 {
     // printf("sending '^'\n");
     return LXOR;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 91 "./src/main.l"
+#line 75 "./src/main.l"
 {
     // printf("sending T\n");
     return TRUE;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 94 "./src/main.l"
+#line 78 "./src/main.l"
 {
     // printf("sending F\n");
     return FALSE;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 97 "./src/main.l"
+#line 81 "./src/main.l"
 {;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 98 "./src/main.l"
+#line 82 "./src/main.l"
 {
     // printf("sending ID %s\n", yytext);
     yylval.str = strdup(yytext);
     printf("sending ID %s\n", yylval.str);
-
-    return IDENTIFIER;}
+    // Token tok = IDENTIFIER;
+    // tok.name = strdup(yytext);
+    // return tok;
+    return IDENTIFIER;
+    }
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 105 "./src/main.l"
+#line 92 "./src/main.l"
 {return EOL;} 
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 106 "./src/main.l"
+#line 93 "./src/main.l"
 {
     // printf("ERROR\n");
         lex_error("Unsupported character", yytext);}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 109 "./src/main.l"
+#line 96 "./src/main.l"
 ECHO;
 	YY_BREAK
-#line 895 "./src/lexer.c"
+#line 883 "./src/lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1896,6 +1884,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 109 "./src/main.l"
+#line 96 "./src/main.l"
 
 

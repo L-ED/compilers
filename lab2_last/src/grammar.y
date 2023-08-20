@@ -31,39 +31,16 @@ int yyparse();
 %%
 /*Grammar*/
 program: 
-   | program operator {printf("Program call\n");}
+   | program operator EOL{printf("Program call\n");}
    ;
 
-operator:
-    EOL {yylineno+=1;}
-    | ops EOL {
-        yylineno+=1;
-        // fprintf(stdout, "Got exp\n");
-        }
-    | IDENTIFIER ASSIGN operator EOL {
-        yylineno+=1;
+operator: ops
+    | IDENTIFIER ASSIGN ops{
+        // yylineno+=1;
         printf("found assign\n");
         }
-
-    // | IDENTIFIER LPARENT opslist RPARENT {
-    //     printf("func call\n");
-    //     }
-
-
-    // | IDENTIFIER LPARENT ops RPARENT {
-    //     // printf("func call\n");
-    //     }
-    // | IDENTIFIER LPARENT ops COMMA ops RPARENT {
-    //     // printf("func call\n");
-    //     }
-    | error EOL// {yyerror;}
+    | error
     ;
-
-// opslist: ops
-//     | ops COMMA opslist {
-//         printf("arglist\n");
-//     }
-
 
 ops: term
     | ops LXOR term {
@@ -82,6 +59,8 @@ ops: term
     | IDENTIFIER LPARENT opslist RPARENT {
         printf("func call\n");
         }
+    
+    
     // | ops COMMA ops {
     //     // printf("args\n");
     //     }
@@ -97,6 +76,7 @@ opslist: ops
     | ops COMMA opslist {
         printf("arglist\n");
     }
+    |
 
 term:
     IDENTIFIER {
@@ -108,7 +88,7 @@ term:
     | FALSE {
         printf("found F\n");
         }
-    |
+    
     // | LPARENT ops RPARENT {printf("found parentheses\n");}
     // | IDENTIFIER LPARENT ops RPARENT {printf("func call\n");}
     // | IDENTIFIER ASSIGN ops {printf("found assign\n");}

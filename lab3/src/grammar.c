@@ -86,13 +86,23 @@ struct Node{
 
 typedef struct Node Node;
 
+struct Token{
+    int token;
+    char* name;
+};
+
+typedef struct Token Token;
+
 union data{
     int tok;
     char* str;
     Node node;
+    Token token;
 };
 
+
 #define YYSTYPE union data
+// #define YYTOKENTYPE Token
 
 
 #include "grammar.h"
@@ -108,7 +118,7 @@ int yyparse();
 
 void create_nesting(int nest_counter){
     for(int i=0;i<nest_counter;i++){
-        printf("|\t");
+        printf("| ");
     }
 }
 
@@ -116,22 +126,21 @@ void parse_tree(Node node, int nest_counter){
 
     create_nesting(nest_counter);
     printf("|-<%s", node.name);
-    switch(node.op){
-        case Var:
-            printf(", \"%s\"", node.id);
-        case Func:
-            printf(", \"%s\"", node.id);
+    if((node.op==Var)||(node.op==Func))
+    {
+        printf(", \"%s\"", node.id);
     }
     printf(">\n");
 
     for(int i=0;i<node.argslen;i++){
+        // printf(" type %s", node.args[i].name);
         parse_tree(node.args[i], nest_counter+1);
     }
     
 }
 
 
-#line 135 "./src/grammar.c"
+#line 144 "./src/grammar.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -196,11 +205,6 @@ extern int yydebug;
 #endif
 
 /* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
 
 
 extern YYSTYPE yylval;
@@ -513,16 +517,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  2
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   45
+#define YYLAST   28
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  16
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  7
+#define YYNNTS  9
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  20
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  33
+#define YYNSTATES  30
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   270
@@ -571,9 +575,9 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    90,    90,    91,    98,    99,   103,   120,   124,   125,
-     139,   153,   176,   177,   201,   202,   216,   226,   235,   245,
-     257
+       0,   102,   102,   103,   110,   111,   140,   141,   159,   177,
+     220,   221,   257,   267,   268,   284,   285,   286,   311,   324,
+     334
 };
 #endif
 
@@ -585,7 +589,7 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "TOK_UMIN", "LAND", "LOR", "LNOT",
   "LXOR", "IDENTIFIER", "TRUE", "FALSE", "RPARENT", "LPARENT", "COMMA",
   "ASSIGN", "EOL", "$accept", "program", "operator", "ops", "opslist",
-  "uop", "term", YY_NULLPTR
+  "uop", "term", "var", "state", YY_NULLPTR
 };
 #endif
 
@@ -599,7 +603,7 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF (-14)
+#define YYPACT_NINF (-18)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -613,10 +617,9 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -14,     0,   -14,     8,     4,   -10,   -14,   -14,   -14,   -14,
-      17,   -14,   -14,   -14,    15,   -14,    20,    10,    27,    27,
-      27,   -14,   -14,    34,    -6,    19,   -14,   -14,   -14,   -14,
-      27,   -14,    34
+     -18,     0,   -18,    14,   -18,   -18,   -18,   -14,    13,   -18,
+     -18,    -7,   -18,   -18,    -8,   -18,     6,     6,     6,     6,
+       6,   -18,   -18,   -18,    13,     8,    13,   -18,     6,    13
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -624,22 +627,21 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       2,     0,     1,     0,     0,    16,    17,    18,     4,     3,
-       0,     8,    14,     7,    16,    15,     0,     0,     0,     0,
-       0,     5,    20,    12,     0,     0,    11,    10,     9,    19,
-       0,     6,    13
+       2,     0,     1,     0,    18,    19,    20,     0,     4,     6,
+      13,    15,    16,    14,    15,     3,     0,     0,     0,    12,
+       0,     9,     8,     7,    10,     0,     5,    17,     0,    11
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -14,   -14,    23,   -13,   -14,    24,    41
+     -18,   -18,   -18,   -17,   -18,     9,    10,    27,   -18
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,     9,    10,    24,    11,    12
+      -1,     1,     7,     8,    25,     9,    10,    14,    12
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -647,46 +649,41 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       2,     3,    16,    23,    17,    29,     4,    30,     5,     6,
-       7,     3,    14,     6,     7,     8,     4,    32,     5,     6,
-       7,    18,    19,    13,    20,     8,     4,    16,    14,     6,
-       7,    22,    21,     4,    31,    14,     6,     7,    18,    19,
-      25,    20,    26,    27,    28,    15
+       2,    15,    24,    26,    19,    19,     3,    20,     4,     5,
+       6,    29,     3,    13,     4,     5,     6,    16,    17,    27,
+      18,    28,     4,     5,     6,    21,    22,    23,    11
 };
 
 static const yytype_int8 yycheck[] =
 {
-       0,     1,    12,    16,    14,    11,     6,    13,     8,     9,
-      10,     1,     8,     9,    10,    15,     6,    30,     8,     9,
-      10,     4,     5,    15,     7,    15,     6,    12,     8,     9,
-      10,    11,    15,     6,    15,     8,     9,    10,     4,     5,
-      17,     7,    18,    19,    20,     4
+       0,    15,    19,    20,    12,    12,     6,    14,     8,     9,
+      10,    28,     6,     3,     8,     9,    10,     4,     5,    11,
+       7,    13,     8,     9,    10,    16,    17,    18,     1
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    17,     0,     1,     6,     8,     9,    10,    15,    18,
-      19,    21,    22,    15,     8,    22,    12,    14,     4,     5,
-       7,    15,    11,    19,    20,    18,    21,    21,    21,    11,
-      13,    15,    19
+       0,    17,     0,     6,     8,     9,    10,    18,    19,    21,
+      22,    23,    24,    22,    23,    15,     4,     5,     7,    12,
+      14,    21,    21,    21,    19,    20,    19,    11,    13,    19
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    16,    17,    17,    18,    18,    18,    18,    19,    19,
-      19,    19,    20,    20,    21,    21,    22,    22,    22,    22,
-      22
+       0,    16,    17,    17,    18,    18,    19,    19,    19,    19,
+      20,    20,    20,    21,    21,    22,    22,    22,    23,    24,
+      24
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0,     2,     1,     2,     4,     2,     1,     3,
-       3,     3,     1,     3,     1,     2,     1,     1,     1,     4,
-       3
+       0,     2,     0,     3,     1,     3,     1,     3,     3,     3,
+       1,     3,     0,     1,     2,     1,     1,     4,     1,     1,
+       1
 };
 
 
@@ -1382,226 +1379,257 @@ yyreduce:
   switch (yyn)
     {
   case 3:
-#line 91 "./src/grammar.y"
-                      {
+#line 103 "./src/grammar.y"
+                          {
         printf("<PROGRAM>\n");
-        // parse_tree($$.node, 0);
+        parse_tree((yyvsp[-1].node), 0);
+        // parse_tree($2.node, 0);
     }
-#line 1391 "./src/grammar.c"
-    break;
-
-  case 4:
-#line 98 "./src/grammar.y"
-        {yylineno+=1;}
-#line 1397 "./src/grammar.c"
+#line 1389 "./src/grammar.c"
     break;
 
   case 5:
-#line 99 "./src/grammar.y"
-              {
-        yylineno+=1;
-        // fprintf(stdout, "Got exp\n");
-        }
-#line 1406 "./src/grammar.c"
-    break;
+#line 111 "./src/grammar.y"
+                     {
+        Node node; 
+        // id;
+        // char idname[] = "IDENTIFIER";
+        // id.name = strdup(idname);
+        // id.argslen=0;
+        // id.id = strdup();
+        // id.op = Var;
 
-  case 6:
-#line 103 "./src/grammar.y"
-                                     {
-        // Node node;
-        // node.op=Assign;
-        // char name[] = "ASSIGN";
-        // node.name = name;
-        // Node* arglist = (Node*)malloc(2*sizeof(*$1.node.args));
+        node.op=Assign;
+        char name[] = "ASSIGN";
+        node.name = strdup(name);
+        Node* arglist = (Node*)malloc(2*sizeof(Node));
+        arglist[0] = (yyvsp[-2].node); 
+        arglist[1] = (yyvsp[0].node);
         // arglist[0] = $1.node; 
         // arglist[1] = $3.node;
-        // node.args = arglist;
-        // node.argslen=2;
+        node.args = arglist;
+        node.argslen=2;
+        (yyval.node) = node;
         // $$.node = node;
-        
-        yylineno+=1;
-        printf("found assign\n");
+        // printf("found assign\n");
 
         }
-#line 1427 "./src/grammar.c"
+#line 1418 "./src/grammar.c"
+    break;
+
+  case 7:
+#line 141 "./src/grammar.y"
+                   {
+        // printf("found op\n");
+        Node node;
+        node.op=BOP;
+        char name[] = "LXOR";
+        node.name = strdup(name);
+        Node* arglist = (Node*)malloc(2*sizeof(Node));
+        // Node* arglist = (Node*)malloc(2*sizeof(*$1.node.args));
+        arglist[0] = (yyvsp[-2].node); 
+        arglist[1] = (yyvsp[0].node);
+        // arglist[0] = $1.node; 
+        // arglist[1] = $3.node;
+        node.argslen=2;
+        node.args = arglist;
+        (yyval.node) = node;
+        // $$.node = node;
+        }
+#line 1440 "./src/grammar.c"
+    break;
+
+  case 8:
+#line 159 "./src/grammar.y"
+                  {
+        // printf("found op\n");
+        Node node;
+        node.op=BOP;
+        char name[] = "LOR";
+        node.name = strdup(name);
+        Node* arglist = (Node*)malloc(2*sizeof(Node));
+        // Node* arglist = (Node*)malloc(2*sizeof(*$1.node.args));
+        arglist[0] = (yyvsp[-2].node); 
+        arglist[1] = (yyvsp[0].node);
+        // arglist[0] = $1.node; 
+        // arglist[1] = $3.node;
+        node.argslen=2;
+        node.args = arglist;
+        (yyval.node) = node;
+        // $$.node = node;
+        }
+#line 1462 "./src/grammar.c"
     break;
 
   case 9:
-#line 125 "./src/grammar.y"
+#line 177 "./src/grammar.y"
                    {
-        printf("found op\n");
-        // Node node;
-        // node.op=BOP;
-        // char name[] = "LXOR";
-        // node.name = name;
+        // printf("found op\n");
+        Node node;
+        node.op=BOP;
+        char name[] = "LAND";
+        node.name = strdup(name);
+        Node* arglist = (Node*)malloc(2*sizeof(Node));
         // Node* arglist = (Node*)malloc(2*sizeof(*$1.node.args));
+        arglist[0] = (yyvsp[-2].node); 
+        arglist[1] = (yyvsp[0].node);
         // arglist[0] = $1.node; 
         // arglist[1] = $3.node;
-        // node.argslen=2;
-        // node.args = arglist;
+        node.args = arglist;
+        node.argslen=2;
+        (yyval.node) = node;
         // $$.node = node;
         }
-#line 1445 "./src/grammar.c"
-    break;
-
-  case 10:
-#line 139 "./src/grammar.y"
-                  {
-        printf("found op\n");
-        // Node node;
-        // node.op=BOP;
-        // char name[] = "LOR";
-        // node.name = name;
-        // Node* arglist = (Node*)malloc(2*sizeof(*$1.node.args));
-        // arglist[0] = $1.node; 
-        // arglist[1] = $3.node;
-        // node.argslen=2;
-        // node.args = arglist;
-        // $$.node = node;
-        }
-#line 1463 "./src/grammar.c"
+#line 1484 "./src/grammar.c"
     break;
 
   case 11:
-#line 153 "./src/grammar.y"
-                   {
-        printf("found op\n");
-        // Node node;
-        // node.op=BOP;
-        // char name[] = "LAND";
-        // node.name = name;
-        // Node* arglist = (Node*)malloc(2*sizeof(*$1.node.args));
-        // arglist[0] = $1.node; 
-        // arglist[1] = $3.node;
-        // node.args = arglist;
-        // node.argslen=2;
-        // $$.node = node;
-        }
-#line 1481 "./src/grammar.c"
-    break;
-
-  case 13:
-#line 177 "./src/grammar.y"
+#line 221 "./src/grammar.y"
                         {
-        printf("arglist %s and op %s\n", yyvsp[-2].node.name, yyvsp[0].node.name);
+        // printf("arglist %s and op %s\n", $1.node.name, $3.node.name);
         // if($1.node.op==Arglist){
         //     int newlen = $1.node.argslen +1; 
         //     // printf("New size is %d\n", newlen);
 
         //     $1.node.args = (Node*)realloc($1.node.args, newlen*sizeof(*$1.node.args));
-        //     // $1.node.args[newlen-1] = $3.node;
-        //     // $$.node = $1.node;
-        // }
-        // else{
-        //     // printf("Not arglist\n");
-        //     Node id;
-        //     id.name = "arglist";
-        //     id.op = Arglist;
-        //     Node* arglist = (Node*)malloc(2*sizeof(*$1.node.args));
-        //     arglist[0] = $1.node; 
-        //     arglist[1] = $3.node;
-        //     id.args = arglist;
-        //     id.argslen = 2;
-        //     $$.node = id;
-        // }
+        //     $1.node.args[newlen-1] = $3.node;
+        //     $$.node = $1.node;
+        // printf("arglist %s and op %s\n", $1.name, $3.name);
+        if((yyvsp[-2].node).op==Arglist){
+            int newlen = (yyvsp[-2].node).argslen +1; 
+            // printf("New size is %d\n", newlen);
+
+            (yyvsp[-2].node).args = (Node*)realloc((yyvsp[-2].node).args, newlen*sizeof(Node));
+            (yyvsp[-2].node).args[newlen-1] = (yyvsp[0].node);
+            (yyvsp[-2].node).argslen = newlen;
+            (yyval.node) = (yyvsp[-2].node);
+        }
+        else{
+            // printf("Not arglist\n");
+            Node id;
+            id.name = "arglist";
+            id.op = Arglist;
+            Node* arglist = (Node*)malloc(2*sizeof(Node));
+            // Node* arglist = (Node*)malloc(2*sizeof(*$1.node.args));
+            arglist[0] = (yyvsp[-2].node); 
+            arglist[1] = (yyvsp[0].node);
+            // arglist[0] = $1.node; 
+            // arglist[1] = $3.node;
+            id.args = arglist;
+            id.argslen = 2;
+            (yyval.node) = id;
+            // $$.node = id;
+        }
     }
-#line 1509 "./src/grammar.c"
+#line 1525 "./src/grammar.c"
     break;
 
-  case 15:
-#line 202 "./src/grammar.y"
+  case 12:
+#line 257 "./src/grammar.y"
+      {
+        Node id;
+        id.name = "arglist";
+        id.op = Arglist;
+        id.args = NULL;
+        id.argslen = 0;
+        (yyval.node) = id;
+    }
+#line 1538 "./src/grammar.c"
+    break;
+
+  case 14:
+#line 268 "./src/grammar.y"
                 {
-        printf("found uop\n");
-        // struct Node id;
-        // char n[]= "LNOT";
-        // id.name = n;
-        // id.argslen=1;
-        // id.op = UOP;
+        // printf("found uop\n");
+        struct Node id;
+        char n[]= "LNOT";
+        id.name = strdup(n);
+        id.argslen=1;
+        id.op = UOP;
+        struct Node arglist[] = {(yyvsp[0].node)};
         // struct Node arglist[] = {$2.node};
-        // id.args = arglist;
+        id.args = arglist;
         // $$.node = id;
+        (yyval.node) = id;
         
         }
-#line 1526 "./src/grammar.c"
-    break;
-
-  case 16:
-#line 216 "./src/grammar.y"
-               {
-        printf("found id {%s}\n", yylval.str);
-        // struct Node id;
-        // char name[] = "IDENTIFIER";
-        // id.name = name;
-        // id.argslen=0;
-        // id.id = strdup(yylval.str);
-        // id.op = Var;
-        // $$.node = id;
-        }
-#line 1541 "./src/grammar.c"
+#line 1557 "./src/grammar.c"
     break;
 
   case 17:
-#line 226 "./src/grammar.y"
-           {
-        printf("found True");
-        // struct Node id;
-        // char n[]= "TRUE";
-        // id.name = n;
-        // id.argslen=0;
-        // id.op = State;
-        // $$.node = id;
+#line 286 "./src/grammar.y"
+                                  {
+        // printf("func call {%s} \n", yylval.str);
+        struct Node id;
+        char name[] = "CALL";
+        id.name = strdup(name);
+        id.id = (yyvsp[-3].node).id;
+        id.op = Func;
+        if((yyvsp[-1].node).op==Arglist){
+            id.args = (yyvsp[-1].node).args;
+            id.argslen = (yyvsp[-1].node).argslen;
         }
-#line 1555 "./src/grammar.c"
-    break;
-
-  case 18:
-#line 235 "./src/grammar.y"
-            {
-        printf("found False");
-        // struct Node id;
-        // char n[]= "FALSE";
-        // id.name = n;
-        // id.argslen=0;
-        // id.op = State;
-        // $$.node = id;
+        else{
+            Node* arglist = (Node*)malloc(sizeof(Node));
+            arglist[0]=(yyvsp[-1].node);
+            id.args = arglist;
+            id.argslen = 1;
         }
-#line 1569 "./src/grammar.c"
-    break;
-
-  case 19:
-#line 245 "./src/grammar.y"
-                                         {
-        printf("func call {%s} {%d}\n", yylval.str, yyvsp[-1].tok);
-        // struct Node id;
-        // char name[] = "CALL";
-        // id.name = name;
-        // id.id = strdup(yylval.str);
-        // id.op = Func;
+        (yyval.node) = id;
         // id.argslen = $3.node.argslen;
         // id.args = $3.node.args;
         // $$.node = id;
         }
-#line 1585 "./src/grammar.c"
+#line 1584 "./src/grammar.c"
+    break;
+
+  case 18:
+#line 311 "./src/grammar.y"
+               {
+        // printf("found id {%s}\n", yylval.str);
+        struct Node id;
+        char name[] = "IDENTIFIER";
+        id.name = strdup(name);
+        id.argslen=0;
+        id.id = strdup(yylval.str);
+        id.op = Var;
+        (yyval.node) = id;
+    }
+#line 1599 "./src/grammar.c"
+    break;
+
+  case 19:
+#line 324 "./src/grammar.y"
+         {
+        // printf("found True");
+        struct Node id;
+        char n[]= "TRUE";
+        id.name = strdup(n);
+        id.argslen=0;
+        id.op = State;
+        // $$.node = id;
+        (yyval.node) = id;
+        }
+#line 1614 "./src/grammar.c"
     break;
 
   case 20:
-#line 257 "./src/grammar.y"
-                                 {
-        printf("func call {%s}\n", yylval.str);
-        // struct Node id;
-        // char name[] = "CALL";
-        // id.name = name;
-        // id.argslen=0;
-        // id.id = strdup(yylval.str);
-        // id.op = Func;
-        // id.args = NULL;
+#line 334 "./src/grammar.y"
+            {
+        // printf("found False");
+        struct Node id;
+        char n[]= "FALSE";
+        id.name = strdup(n);
+        id.argslen=0;
+        id.op = State;
         // $$.node = id;
+        (yyval.node)= id;
         }
-#line 1601 "./src/grammar.c"
+#line 1629 "./src/grammar.c"
     break;
 
 
-#line 1605 "./src/grammar.c"
+#line 1633 "./src/grammar.c"
 
       default: break;
     }
@@ -1833,7 +1861,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 268 "./src/grammar.y"
+#line 344 "./src/grammar.y"
 
 
 
